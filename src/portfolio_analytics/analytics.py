@@ -1,4 +1,5 @@
 import calendar
+import math
 from datetime import datetime
 
 import scipy.optimize
@@ -43,68 +44,94 @@ def performance_stats(return_series: pd.Series, risk_free_rate: pd.Series = None
             return None
 
     def func_2(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         return annualize_returns(series, periods_per_year)
 
     func_2.__name__ = "Return (Ann.)"
 
     def func_3(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         return annualize_vol(series, periods_per_year)
 
     func_3.__name__ = "Volatility (Ann.)"
 
     def func_4(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         return skewness(series)
 
     func_4.__name__ = "Skewness"
 
     def func_5(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         return kurtosis(series)
 
     func_5.__name__ = "Kurtosis"
 
     def func_6(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         if risk_free_rate is None:
-            return pd.Series([np.nan], index=series.name)
+            return np.nan
         return sharpe_ratio(series, risk_free_rate, periods_per_year)
 
     func_6.__name__ = "Sharpe Ratio"
 
     def func_7(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         return var_gaussian(series, modified=True)
 
     func_7.__name__ = "VaR 95%"
 
     def func_8(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         return cvar_historic(series)
 
     func_8.__name__ = "CVaR 95%"
 
     def func_9(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         return max_drawdown(series)
 
     func_9.__name__ = "Max Drawdown"
 
     def func_10(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         return sum(series > 0) / len(series.dropna())
 
     func_10.__name__ = "Up Months"
 
     def func_11(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         return sum(series < 0) / len(series.dropna())
 
     func_11.__name__ = "Down Months"
 
     def func_12(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         return series.max()
 
     func_12.__name__ = "Largest Positive Month"
 
     def func_13(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         return series.min()
 
     func_13.__name__ = "Largest Negative Month"
 
     def func_15(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         return longest_drawdown(series)
 
     func_15.__name__ = "Longest Drawdown(Months)"
@@ -163,86 +190,110 @@ def return_stats(return_series: pd.Series, risk_free_rate: pd.Series = None, per
     quarter = return_series.index[-1].quarter
 
     def func_0(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         return series.iloc[-1]
 
     func_0.__name__ = 'MTD Returns'
 
     def func_1(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         return (
                 (1 + series[(series.index.quarter == quarter) & (series.index.year == year)]).prod() - 1)
 
     func_1.__name__ = 'QTD Returns'
 
     def func_2(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         return (1 + series[series.index.year == year]).prod() - 1
 
     func_2.__name__ = 'YTD Returns'
 
     def func_3(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         # Not enough data
         if series.dropna().shape[0] < 12 or series.name == 'Libor 1M Monthly Return':
-            return pd.Series([np.nan], index=series.name)
+            return np.nan
         return annualize_returns(series.tail(12), periods_per_year)
 
     func_3.__name__ = 'L12M Returns'
 
     def func_4(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         # Not enough data
         if series.dropna().shape[0] < 12 or series.name == 'Libor 1M Monthly Return':
-            return pd.Series([np.nan], index=series.name)
+            return np.nan
         return annualize_vol(series.tail(12), periods_per_year)
 
     func_4.__name__ = 'L12M Volatility'
 
     def func_5(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         # Not enough data
         if series.dropna().shape[0] < 12 or series.name == 'Libor 1M Monthly Return':
-            return pd.Series([np.nan], index=series.name)
+            return np.nan
         elif risk_free_rate is None:
-            return pd.Series([np.nan], index=series.name)
+            return np.nan
         return sharpe_ratio(series.tail(12), risk_free_rate.tail(12), periods_per_year)
 
     func_5.__name__ = 'L12M Sharpe'
 
     def func_6(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         # Not enough data
         if series.dropna().shape[0] < 36 or series.name == 'Libor 1M Monthly Return':
-            return pd.Series([np.nan], index=series.name)
+            return np.nan
         return annualize_returns(series.tail(36), periods_per_year)
 
     func_6.__name__ = 'L3Y Returns'
 
     def func_7(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         # Not enough data
         if series.dropna().shape[0] < 36 or series.name == 'Libor 1M Monthly Return':
-            return pd.Series([np.nan], index=series.name)
+            return np.nan
         return annualize_vol(series.tail(36), periods_per_year)
 
     func_7.__name__ = 'L3Y Volatility'
 
     def func_8(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         # Not enough data
         if series.dropna().shape[0] < 36 or series.name == 'Libor 1M Monthly Return':
-            return pd.Series([np.nan], index=series.name)
+            return np.nan
         elif risk_free_rate is None:
-            return pd.Series([np.nan], index=series.name)
+            return np.nan
         return sharpe_ratio(series.tail(36), risk_free_rate.tail(36), periods_per_year)
 
     func_8.__name__ = 'L3Y Sharpe'
 
     def func_9(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         return annualize_returns(series, periods_per_year)
 
     func_9.__name__ = 'ITD Returns'
 
     def func_10(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         return annualize_vol(series, periods_per_year)
 
     func_10.__name__ = 'ITD Volatility'
 
     def func_11(series):
+        if not isinstance(series, pd.Series):
+            return np.nan
         if risk_free_rate is None:
-            return pd.Series([np.nan], index=series.name)
+            return np.nan
         return sharpe_ratio(series, risk_free_rate, periods_per_year)
 
     func_11.__name__ = 'ITD Sharpe'
@@ -679,7 +730,7 @@ def annualize_returns(return_series: pd.Series, periods_per_year: int = 12, drop
     return_series.dropna(inplace=True)
 
     compounded_growth = (1 + return_series).prod().squeeze()
-    annualized_returns = np.math.pow(
+    annualized_returns = math.pow(
         compounded_growth, (periods_per_year / n_periods)) - 1
     return annualized_returns  # Base Case
 
@@ -719,7 +770,7 @@ def annualize_vol(return_series: pd.Series, periods_per_year: int = 12, dropna: 
     if (not dropna) and (return_series.isna().sum().squeeze() > 0):
         return np.nan
     return_series.dropna(inplace=True)
-    annualized_vol = return_series.std() * (np.math.sqrt(periods_per_year))
+    annualized_vol = return_series.std() * (math.sqrt(periods_per_year))
     return annualized_vol.squeeze()
 
 

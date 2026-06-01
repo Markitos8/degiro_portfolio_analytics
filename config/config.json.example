@@ -1,0 +1,5 @@
+{
+    "username": "YOUR_DEGIRO_USERNAME",
+    "password": "YOUR_DEGIRO_PASSWORD",
+    "totp_secret_key": "YOUR_TOTP_SECRET_IF_2FA_ENABLED"
+}

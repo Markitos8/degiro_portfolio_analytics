@@ -1,4 +1,7 @@
 .idea
 .vscode
 data
+output
+.env
+config/config.json
 **/__pycache__/

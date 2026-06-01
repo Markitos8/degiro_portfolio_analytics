@@ -1,0 +1,20 @@
+# Data & caches (not useful for @Codebase)
+data/
+outputs_bess_stochastic/
+output/
+**/*.p
+**/*.pkl
+**/*.parquet
+**/*.sqlite
+**/*.db
+
+# Raw / scratch files
+_*.txt
+_cell*.txt
+_irena_*.txt
+_aurora_*.txt
+*.bak
+
+# Already excluded
+*.csv
+*.xlsx
