@@ -32,9 +32,21 @@ C:\Users\mardom10000232\AppData\Local\anaconda3\envs\markines311\python.exe scri
 | Item | Path |
 |------|------|
 | DeGiro login | `config/config.json` (copy from `mark_ines/medium/config/config.json`) |
-| Market data keys | `.env` (copy from `EOM/.env`: `POLYGON_API_KEY`, `EODHD_API_KEY`) |
+| Market data keys | `.env` (copy from `.env.example` or `EOM/.env`: `POLYGON_API_KEY`, `EODHD_API_KEY`) |
 
 Load env with `python-dotenv` in `degiro_analytics/settings.py`.
+
+## EOD providers
+
+Fetch order for closes: **EODHD → Polygon → Yahoo chart API → yfinance**.
+
+```powershell
+# Connectivity probe (free sources + optional paid keys)
+python scripts/check_eod_sources.py --allow-missing-keys --write-db
+
+# Smoke-test EODHD with their public demo token (AAPL/US only)
+python scripts/check_eod_sources.py --use-eodhd-demo --allow-missing-keys
+```
 
 ## Data Flow
 
@@ -45,7 +57,7 @@ degiro_connector API
 data/cache/degiro_connector_data/   (account, positions, transactions CSV)
         │
         ▼
-EOD providers (EODHD → Polygon → Yahoo) + ISIN→ticker map
+EOD providers (EODHD → Polygon → Yahoo → yfinance) + ISIN→ticker map
         │
         ▼
 data/sqlite/eod_prices.sqlite

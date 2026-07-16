@@ -1,9 +1,8 @@
 import os
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pandas as pd
-import pandas_datareader.data as web
 import requests
 from numpy.random import rand
 
@@ -20,9 +19,38 @@ def retrieve_yahoo_adj_close_data(symbol: str,
                                   start_date: str,
                                   end_date: str = None,
                                   ) -> pd.Series:
+    """Fetch adjusted close via Yahoo chart API (pandas_datareader yahoo is no longer available)."""
     end_date = datetime.today().strftime(DATE_FORMAT) if end_date is None else end_date
-    series = web.DataReader(symbol, 'yahoo', start=start_date, end=end_date)['Adj Close']
-    return series.loc[~series.index.duplicated()]  # Avoid storing duplicates
+    start_ts = int(datetime.strptime(start_date, DATE_FORMAT).timestamp())
+    end_ts = int((datetime.strptime(end_date, DATE_FORMAT) + timedelta(days=1)).timestamp())
+    params = {"period1": start_ts, "period2": end_ts, "interval": "1d", "events": "div,splits"}
+    headers = {"User-Agent": "Mozilla/5.0"}
+    last_error = None
+    for host in ("https://query1.finance.yahoo.com", "https://query2.finance.yahoo.com"):
+        url = f"{host}/v8/finance/chart/{symbol}"
+        try:
+            resp = requests.get(url, params=params, timeout=20, headers=headers)
+            resp.raise_for_status()
+            result = (((resp.json() or {}).get("chart") or {}).get("result") or [None])[0]
+            if not result:
+                last_error = RuntimeError(f"Yahoo chart empty for {symbol}")
+                continue
+            timestamps = result.get("timestamp") or []
+            indicators = result.get("indicators") or {}
+            adjclose_block = (indicators.get("adjclose") or [{}])[0]
+            quote_block = (indicators.get("quote") or [{}])[0]
+            prices = adjclose_block.get("adjclose") or quote_block.get("close") or []
+            if not timestamps or not prices:
+                last_error = RuntimeError(f"Yahoo chart missing series for {symbol}")
+                continue
+            idx = pd.to_datetime(timestamps, unit="s", utc=True).tz_localize(None)
+            series = pd.Series(prices, index=idx, name=symbol)
+            series = pd.to_numeric(series, errors="coerce").dropna()
+            return series.loc[~series.index.duplicated()]
+        except Exception as exc:
+            last_error = exc
+            continue
+    raise RuntimeError(f"Yahoo EOD fetch failed for {symbol}: {last_error}")
 
 
 def generate_returns_from_yahoo_data(yahoo_adj_close_data: pd.DataFrame):
