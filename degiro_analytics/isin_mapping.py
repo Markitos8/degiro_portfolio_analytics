@@ -16,7 +16,7 @@ MANUAL_ISIN_OVERRIDES = {
     "FR0011675362": "N1N.F",
     "AU000000BKY0": "BKY.MC",
     "ES0105079000": "GRE.MC",
-    "FR0011742329": "ALMCP.PA",
+    "FR0011742329": "MPHYF",  # McPhy; ALMCP.PA no longer quotes on Yahoo
 }
 
 
